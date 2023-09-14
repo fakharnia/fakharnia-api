@@ -12,6 +12,11 @@ const { logger } = require("./middleware/logEvents");
 const rateLimit = require('express-rate-limit');
 const PORT = process.env.PORT || 5000;
 
+const mongoose = require("mongoose");
+const connectDB = require("./config/dbConfig");
+
+connectDB();
+
 app.use(logger);
 app.use(helmet({ hsts: { maxAge: 31536000, includeSubDomains: true } }));
 app.use(credentials);
@@ -30,4 +35,7 @@ const limiter = rateLimit({
     legacyHeaders: false,
 });
 
-app.listen(PORT, () => console.log(`Server running on port ${PORT}`));
+mongoose.connection.once("open", () => {
+    console.log("Connected to MongoDB");
+    app.listen(PORT, () => { console.log(`Server running on port ${PORT}`) });
+})
