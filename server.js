@@ -26,6 +26,7 @@ app.use(express.json());
 app.use(cookieParser());
 app.use("/resources", express.static(path.join(__dirname, "/public")));
 
+app.use("/api", require("./routes/authentication"));
 app.get("/", (req, res, next) => res.json({ "message": "There is nothing for you kiddo!" }));
 
 const limiter = rateLimit({
