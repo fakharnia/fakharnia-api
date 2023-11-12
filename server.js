@@ -31,6 +31,7 @@ app.use('/public', express.static('public'));
 app.use("/api/authentication", require("./routes/authentication"));
 app.use("/api/blog", require("./routes/blog"));
 app.use("/api/status", require("./routes/status"));
+app.use("/api/service", require("./routes/service"));
 app.get("/", (req, res, next) => res.json({ "message": "There is nothing for you kiddo!" }));
 
 const limiter = rateLimit({
