@@ -3,16 +3,20 @@ const Schema = mongoose.Schema;
 
 const serviceSchema = new Schema({
     title: {
-        type: String
+        type: String,
+        required: true
     },
     priority: {
-        type: Number
+        type: Number,
+        required: true
     },
     content: {
-        type: String
+        type: String,
+        required: true
     },
     coverUrl: {
-        type: String
+        type: String,
+        required: true
     },
     coverAlt: {
         type: String

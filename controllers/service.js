@@ -78,4 +78,29 @@ const updateService = async (req, res) => {
     }
 }
 
-module.exports = { getServices, getService, createService, updateService };
+const deleteService = async (req, res) => {
+    try {
+        const { serviceId } = req.params;
+        if (serviceId) {
+            const service = await Service.findOne({ _id: serviceId });
+            if (service.coverUrl) {
+                const filePath = path.join('public', 'service', service.coverUrl);
+                if (service.coverUrl) {
+                    fs.unlink(filePath, (error) => {
+                        if (error) {
+                            console.log(`Error deleting file: ${error}`);
+                        } else {
+                            console.log(`file delete successfully!`);
+                        }
+                    })
+                }
+            }
+            await Service.deleteOne({ _id: serviceId });
+        }
+        return res.status(200).json({ message: "Successfully deleted!" });
+    } catch (error) {
+        return res.status(500).json(error);
+    }
+}
+
+module.exports = { getServices, getService, createService, updateService, deleteService };

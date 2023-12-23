@@ -1,6 +1,7 @@
 const multer = require("multer");
 const path = require("path");
 const fs = require('fs');
+const mongoose = require('mongoose');
 
 const getStorage = (folderName) => {
     return multer.diskStorage({
@@ -10,7 +11,27 @@ const getStorage = (folderName) => {
             cb(null, uploadPath);
         },
         filename: (req, file, cb) => {
-            cb(null, file.originalname);
+            let postId = req.body.postId || new mongoose.Types.ObjectId();
+            const filename = `${postId}${path.extname(file.originalname)}`;
+
+            const uploadPath = path.join("public", folderName, filename);
+
+            while (fs.existsSync(uploadPath)) {
+                postId = new mongoose.Types.ObjectId();
+            }
+
+            switch (folderName) {
+                case "avatar":
+                    req.body.avatarUrl = filename;
+                    break;
+                case "service":
+                    req.body.coverUrl = filename;
+                    break;
+                case "project":
+                    req.body.logoUrl = filename;
+                    break;
+            }
+            cb(null, filename);
         },
     });
 };
@@ -18,4 +39,5 @@ const getStorage = (folderName) => {
 module.exports = {
     uploadAvatar: multer({ storage: getStorage("avatar") }),
     uploadService: multer({ storage: getStorage("service") }),
+    uploadProject: multer({ storage: getStorage("project") }),
 };
