@@ -8,12 +8,10 @@ const credentials = require("./middleware/credentials");
 const helmet = require("helmet");
 const cookieParser = require("cookie-parser");
 const { logger } = require("./middleware/logEvents");
-const rateLimit = require('express-rate-limit');
 const PORT = process.env.PORT || 5000;
 
 const mongoose = require("mongoose");
 const connectDB = require("./config/dbConfig");
-
 
 connectDB();
 
@@ -33,16 +31,10 @@ app.use("/api/blog", require("./routes/blog"));
 app.use("/api/status", require("./routes/status"));
 app.use("/api/service", require("./routes/service"));
 app.use("/api/project", require("./routes/project"));
+app.use("/api/design", require("./routes/design"));
 app.get("/", (req, res, next) => res.json({ "message": "There is nothing for you kiddo!" }));
-
-const limiter = rateLimit({
-    windowMs: 2000,
-    max: 1,
-    standardHeaders: true,
-    legacyHeaders: false,
-});
 
 mongoose.connection.once("open", () => {
     console.log("Connected to MongoDB");
     app.listen(PORT, () => { console.log(`Server running on port ${PORT}`) });
-})
+});
