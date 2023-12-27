@@ -27,16 +27,14 @@ const projectSchema = new Schema({
         required: true,
     },
     url: {
-        type: String,
-        required: false,
+        type: String
     },
     logoUrl: {
         type: String,
         required: false
     },
     logoAlt: {
-        type: String,
-        required: false
+        type: String
     },
     techDescription: {
         type: String,

@@ -3,8 +3,7 @@ const Schema = mongoose.Schema;
 
 const uiImageSchema = new Schema({
     priority: {
-        type: Number,
-        required: true
+        type: Number
     },
     fileAlt: {
         type: String

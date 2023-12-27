@@ -2,8 +2,7 @@ const express = require("express");
 const router = express.Router();
 const { uploadDesign } = require("../middleware/multer");
 
-
-const { getDesigns, getDesign, createDesign, updateDesign, deleteDesign } = require("../controllers/design");
+const { getDesigns, getDesign, createDesign, updateDesign, deleteDesign } = require("../controllers/designController");
 
 router.get("/getDesigns", getDesigns);
 router.get("/getDesign/:designId", getDesign);

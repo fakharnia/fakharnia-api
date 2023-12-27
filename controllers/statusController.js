@@ -6,15 +6,14 @@ const Status = require("../model/Status");
 const getStatus = async (req, res) => {
     try {
         const status = await Status.findOne();
-        res.status(200).json(status);
+        return res.status(200).json(status);
     } catch (error) {
-        res.status(500).json(error);
+        return res.status(500).json(error);
     }
 }
 
 const updateStatus = async (req, res) => {
     try {
-
         const model = stringValidation(req.body);
 
         if (model._id) {
@@ -45,7 +44,7 @@ const updateStatus = async (req, res) => {
                         dailyText: model.dailyText,
                         title: model.title,
                         state: model.state,
-                        hasAvatar: req.file ? true : false,
+                        hasAvatar: (model.deleteAvatar && !req.file) ? false : true,
                         avatarUrl: model.avatarUrl
                     }
                 },
@@ -65,7 +64,6 @@ const updateStatus = async (req, res) => {
 
 
     } catch (error) {
-        console.log(error)
         return res.status(500).json({ "error": error });
     }
 }

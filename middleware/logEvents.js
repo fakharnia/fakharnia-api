@@ -4,25 +4,24 @@ const fs = require("fs");
 const fsPromises = require("fs").promises;
 const path = require("path");
 
-
-const logEvents = async (message, logName) => {
+const logEvents = (message, logName) => {
     const dateTime = `${format(new Date(), "yyyyMMdd\tHH:mm:ss")}`;
     const logItem = `${dateTime}\t${uuid()}\t${message}\n`;
-    console.log(logItem);
-    try {
-        if (!fs.existsSync(path.join(__dirname, "..", "logs"))) {
-            await fsPromises.mkdir(path.join(__dirname, "..", "logs"));
-        }
-        await fsPromises.appendFile(path.join(__dirname, "..", "logs", logName), logItem);
-    } catch (error) {
-        console.error(error);
+    if (!fs.existsSync(path.join(__dirname, "..", "logs"))) {
+        fsPromises.mkdir(path.join(__dirname, "..", "logs"));
     }
+    fsPromises.appendFile(path.join(__dirname, "..", "logs", logName), logItem);
 }
 
-const logger = async (req, res, next) => {
-    await logEvents(`${req.method}\t${req.headers.origin} ${req.url} IP:${req.socket.remoteAddress ? req.socket.remoteAddress : req.headers["x-forwarded-for"]}`, "reqLog.txt");
-    console.log(`${req.method} ${req.path}`);
+const logger = (req, res, next) => {
+    const message = `${req.method}\t${req.headers.origin} ${req.url} IP:${req.socket.remoteAddress ? req.socket.remoteAddress : req.headers["x-forwarded-for"]}`;
+    logEvents(message, "reqLog.txt");
     next();
 };
 
-module.exports = { logEvents, logger };
+const errorLogger = (error, req, res, next) => {
+    const message = `\n${error}\n${req.method}${req.headers.origin} ${req.url} IP:${req.socket.remoteAddress ? req.socket.remoteAddress : req.headers["x-forwarded-for"]}`;
+    logEvents(message, "errorLog.txt");
+}
+
+module.exports = { logEvents, logger, errorLogger };
