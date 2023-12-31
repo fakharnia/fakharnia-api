@@ -34,6 +34,7 @@ app.use("/api/status", require("./routes/statusRouter"));
 app.use("/api/service", require("./routes/serviceRouter"));
 app.use("/api/project", require("./routes/projectRouter"));
 app.use("/api/design", require("./routes/designRouter"));
+app.use("/api/resume", require("./routes/resumeRouter"));
 app.get("/", (req, res, next) => res.json({ "message": "There is nothing for you kiddo!" }));
 
 mongoose.connection.once("open", () => {
