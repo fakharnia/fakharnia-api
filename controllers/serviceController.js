@@ -1,11 +1,12 @@
-const stringValidation = require("../extensions/objectValidation");
 const path = require("path");
-const fs = require("fs");
+const formidable = require('formidable');
 const Service = require("../model/Service");
+const { removeFileSync, uploadFileSync } = require("../extensions/uploadExtensions");
+const { objectValidation } = require("../extensions/objectValidation");
 
-const modelValidation = async (rawData) => {
+const serviceValidation = async (rawData) => {
     try {
-        const model = stringValidation(rawData);
+        const model = rawData;
         let result = true;
 
         if (!model) {
@@ -54,8 +55,18 @@ const getService = async (req, res) => {
 
 const createService = async (req, res) => {
     try {
-        if (modelValidation(req.body)) {
-            const model = stringValidation(req.body);
+        const form = new formidable.IncomingForm({
+            uploadDir: path.join("public", "temp"),
+        });
+        const [fields, files] = await form.parse(req);
+        const model = objectValidation(fields);
+
+        if (serviceValidation(model)) {
+            const result = await uploadFileSync(files, "cover", "service");
+            if (result != undefined) {
+                model.coverUrl = result;
+            }
+
             await Service.create({
                 title: model.title,
                 priority: model.priority,
@@ -76,21 +87,22 @@ const createService = async (req, res) => {
 
 const updateService = async (req, res) => {
     try {
-        if (modelValidation(req.body)) {
-            const model = stringValidation(req.body);
+        const form = new formidable.IncomingForm({
+            uploadDir: path.join("public", "temp"),
+        });
+        const [fields, files] = await form.parse(req);
+        const model = objectValidation(fields);
 
-            if (model.coverChanged) {
-                const currentData = await Service.findById(model._id);
-                const filePath = path.join('public', 'service', currentData.coverUrl);
-                fs.unlink(filePath, (error) => {
-                    if (error) {
-                        console.log(`Error deleting file: ${error}`);
-                    } else {
-                        console.log(`file delete successfully!`);
-                    }
-                })
+        const result = await uploadFileSync(files, "cover", "service");
+        if (result != undefined) {
+            //  remove old avatar file
+            const service = await Service.findById(model._id);
+            if (service && service.coverUrl) {
+                await removeFileSync(path.join("public", "service", service.coverUrl));
             }
-
+            model.coverUrl = result;
+        }
+        if (serviceValidation(model)) {
             await Service.findOneAndUpdate(
                 { _id: model._id },
                 {
@@ -122,13 +134,7 @@ const deleteService = async (req, res) => {
             const service = await Service.findOne({ _id: serviceId });
             if (service.coverUrl) {
                 const filePath = path.join('public', 'service', service.coverUrl);
-                fs.unlink(filePath, (error) => {
-                    if (error) {
-                        console.log(`Error deleting file: ${error}`);
-                    } else {
-                        console.log(`file delete successfully!`);
-                    }
-                })
+                await removeFileSync(filePath);
             }
             await Service.deleteOne({ _id: serviceId });
             return res.status(200).json({ message: "Successfully deleted!" });

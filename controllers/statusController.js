@@ -1,7 +1,8 @@
-const stringValidation = require("../extensions/objectValidation");
 const path = require("path");
-const fs = require("fs");
+const formidable = require('formidable');
 const Status = require("../model/Status");
+const { uploadFileSync, removeFilesSync, removeFileSync } = require("../extensions/uploadExtensions");
+const { objectValidation } = require("../extensions/objectValidation");
 
 const getStatus = async (req, res) => {
     try {
@@ -14,28 +15,26 @@ const getStatus = async (req, res) => {
 
 const updateStatus = async (req, res) => {
     try {
-        const model = stringValidation(req.body);
+        const form = new formidable.IncomingForm({
+            uploadDir: path.join("public", "temp"),
+        });
+        const [fields, files] = await form.parse(req);
+
+        const result = await uploadFileSync(files, "avatar", "avatar");
+        const model = objectValidation(fields);
+        if (result != undefined) {
+            //  remove old avatar file
+            const status = await Status.findById(model._id);
+            if (status && status?.avatarUrl) {
+                await removeFileSync(path.join("public", "avatar", status.avatarUrl));
+            }
+            model.avatarUrl = result;
+        }
 
         if (model._id) {
             if (model.deleteAvatar) {
                 const directoryPath = path.join("public", "avatar");
-                fs.readdir(directoryPath, (err, files) => {
-                    if (err) {
-                        console.error('Error reading directory:', err);
-                        return;
-                    }
-                    files.forEach((file) => {
-                        const filePath = path.join(directoryPath, file);
-
-                        fs.unlink(filePath, (err) => {
-                            if (err) {
-                                console.error('Error deleting file:', filePath, err);
-                            } else {
-                                console.log('Deleted file:', filePath);
-                            }
-                        });
-                    });
-                });
+                await removeFilesSync(directoryPath);
             }
             await Status.findOneAndUpdate(
                 { _id: model._id },
@@ -51,7 +50,7 @@ const updateStatus = async (req, res) => {
                 { new: true }
             );
         } else {
-            await Status.create({
+            model._id = await Status.create({
                 dailyText: model.dailyText,
                 title: model.title,
                 state: model.state,
@@ -61,12 +60,9 @@ const updateStatus = async (req, res) => {
         }
 
         return res.status(200).json({ "message": "Successful!" });
-
-
     } catch (error) {
         return res.status(500).json({ "error": error });
     }
 }
 
 module.exports = { getStatus, updateStatus };
-

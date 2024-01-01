@@ -36,4 +36,7 @@ const designSchema = new Schema({
     }
 })
 
-module.exports = mongoose.model("Design", designSchema);
+module.exports = {
+    Design: mongoose.model("Design", designSchema),
+    UiImage: mongoose.model("UiImage", uiImageSchema)
+};

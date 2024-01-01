@@ -1,11 +1,12 @@
-const stringValidation = require("../extensions/objectValidation");
 const path = require("path");
-const fs = require("fs");
+const formidable = require('formidable');
 const Project = require("../model/Project");
+const { removeFileSync, uploadFileSync } = require("../extensions/uploadExtensions");
+const { objectValidation } = require("../extensions/objectValidation");
 
-const modelValidation = (rawData) => {
+const projectValidation = (rawData) => {
     try {
-        const model = stringValidation(rawData);
+        const model = rawData;
         let result = true;
 
         if (!model) {
@@ -37,9 +38,9 @@ const modelValidation = (rawData) => {
     }
 }
 
-const innerModelValidation = (rawData) => {
+const projectTechnologiesValidation = (rawData) => {
     try {
-        const model = stringValidation(JSON.parse(rawData));
+        const model = rawData;
         let result = true;
 
         if (!model || model.length === 0) {
@@ -80,9 +81,17 @@ const getProject = async (req, res) => {
 
 const createProject = async (req, res) => {
     try {
-        if (modelValidation(req.body)) {
-            const model = stringValidation(req.body);
-            const innerModel = innerModelValidation(model.technologies) ? JSON.parse(model.technologies) : [];
+        const form = new formidable.IncomingForm({
+            uploadDir: path.join("public", "temp"),
+        });
+        const [fields, files] = await form.parse(req);
+        const model = objectValidation(fields);
+        if (projectValidation(model) && projectTechnologiesValidation(model.technologies)) {
+
+            const result = await uploadFileSync(files, "logo", "project");
+            if (result != undefined) {
+                model.logoUrl = result;
+            }
             const project = new Project({
                 name: model.name,
                 priority: model.priority,
@@ -91,7 +100,7 @@ const createProject = async (req, res) => {
                 logoUrl: model.logoUrl,
                 logoAlt: model.logoAlt,
                 techDescription: model.techDescription,
-                technologies: innerModel
+                technologies: model.technologies
             });
             await project.save();
             return res.status(200).json({ message: "Successfully Created!" });
@@ -108,24 +117,22 @@ const createProject = async (req, res) => {
 const updateProject = async (req, res) => {
 
     try {
-        if (modelValidation(req.body)) {
-            const model = stringValidation(req.body);
-            const innerModel = innerModelValidation(model.technologies) ? JSON.parse(model.technologies) : []
+        const form = new formidable.IncomingForm({
+            uploadDir: path.join("public", "temp"),
+        });
+        const [fields, files] = await form.parse(req);
+        const model = objectValidation(fields);
+        if (projectValidation(model) && projectTechnologiesValidation(model.technologies)) {
 
-            if (model.logoChanged) {
-                const currentData = await Project.findById(model._id);
-                if (currentData.logoUrl) {
-                    const filePath = path.join('public', 'Project', currentData.logoUrl);
-                    fs.unlink(filePath, (error) => {
-                        if (error) {
-                            console.log(`Error deleting file: ${error}`);
-                        } else {
-                            console.log(`file delete successfully!`);
-                        }
-                    })
+            const result = await uploadFileSync(files, "logo", "project");
+            if (result != undefined) {
+                //  remove old avatar file
+                const project = await Project.findById(model._id);
+                if (project && project.logoUrl) {
+                    await removeFileSync(path.join("public", "project", project.logoUrl));
                 }
+                model.logoUrl = result;
             }
-
             await Project.findOneAndUpdate(
                 { _id: model._id },
                 {
@@ -137,7 +144,7 @@ const updateProject = async (req, res) => {
                         logoUrl: model.logoUrl,
                         logoAlt: model.logoAlt,
                         techDescription: model.techDescription,
-                        technologies: innerModel
+                        technologies: model.technologies
                     }
                 },
                 { new: true }
@@ -157,16 +164,8 @@ const deleteProject = async (req, res) => {
         if (projectId) {
             const project = await Project.findOne({ _id: projectId });
             if (project.logoUrl) {
-                const filePath = path.join('public', 'Project', project.logoUrl);
-                if (project.logoUrl) {
-                    fs.unlink(filePath, (error) => {
-                        if (error) {
-                            console.log(`Error deleting file: ${error}`);
-                        } else {
-                            console.log(`file delete successfully!`);
-                        }
-                    })
-                }
+                const filePath = path.join('public', 'project', project.logoUrl);
+                await removeFileSync(filePath);
             }
             await Project.deleteOne({ _id: projectId });
         }

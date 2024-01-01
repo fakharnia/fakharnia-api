@@ -1,11 +1,13 @@
-const stringValidation = require("../extensions/objectValidation");
+const { objectValidation } = require("../extensions/objectValidation");
 const path = require("path");
 const fs = require("fs");
-const Design = require("../model/Design");
+const formidable = require('formidable');
+const { Design, UiImage } = require("../model/Design");
+const { removeFileSync, uploadFilesSync } = require("../extensions/uploadExtensions");
 
-const modelValidation = (rawData) => {
+const designValidation = (rawData) => {
     try {
-        const model = stringValidation(rawData);
+        const model = rawData;
         let result = true;
 
         if (!model) {
@@ -23,7 +25,7 @@ const modelValidation = (rawData) => {
             result = false;
         }
 
-        if (model.images === null || model.images === undefined || model.images.length === 0) {
+        if (model.imagesData === null || model.imagesData === undefined || model.imagesData.length === 0) {
             result = false;
         }
 
@@ -33,9 +35,9 @@ const modelValidation = (rawData) => {
     }
 }
 
-const innerModelValidation = (rawData) => {
+const designImageValidation = (rawData) => {
     try {
-        const model = stringValidation(JSON.parse(rawData));
+        const model = rawData;
         let result = true;
 
         if (!model || model.length === 0) {
@@ -98,11 +100,25 @@ const getDesign = async (req, res) => {
 
 const createDesign = async (req, res) => {
     try {
-        if (modelValidation(req.body)) {
-            const model = stringValidation(req.body);
-            const innerModel = innerModelValidation(model.imagesData) ? JSON.parse(model.imagesData) : [];
+        const form = new formidable.IncomingForm({
+            uploadDir: path.join("public", "temp"),
+        });
+        const [fields, files] = await form.parse(req);
+        const model = objectValidation(fields);
 
-            const images = innerModel.map(image => ({
+        if (designValidation(model) && designImageValidation(model.imagesData)) {
+
+            for (let file of files.images) {
+                const result = await uploadFilesSync(file, "design", "design");
+                if (result != undefined) {
+                    const foundedImage = model.imagesData.findIndex(img => img.fileUrl === file.originalFilename);
+                    if (foundedImage != -1) {
+                        model.imagesData[foundedImage].fileUrl = result;
+                    }
+                }
+            }
+
+            const images = model.imagesData.map(image => ({
                 priority: image.priority,
                 fileAlt: image.fileAlt,
                 fileUrl: image.fileUrl,
@@ -126,12 +142,27 @@ const createDesign = async (req, res) => {
 
 const updateDesign = async (req, res) => {
     try {
+        const form = new formidable.IncomingForm({
+            uploadDir: path.join("public", "temp"),
+        });
+        const [fields, files] = await form.parse(req);
+        const model = objectValidation(fields);
 
-        if (modelValidation(req.body)) {
-            const model = stringValidation(req.body);
-            const innerModel = innerModelValidation(model.imagesData) ? JSON.parse(model.imagesData) : [];
+        if (designValidation(model) && designImageValidation(model.imagesData)) {
 
-            const images = innerModel.map(image => ({
+            if (files?.images && files.images.length > 0) {
+                for (let file of files?.images) {
+                    const result = await uploadFilesSync(file, "design", "design");
+                    if (result != undefined) {
+                        const foundedImage = model.imagesData.findIndex(img => img.fileUrl === file.originalFilename);
+                        if (foundedImage != -1) {
+                            model.imagesData[foundedImage].fileUrl = result;
+                        }
+                    }
+                }
+            }
+
+            const images = model.imagesData.map(image => ({
                 priority: image.priority,
                 fileAlt: image.fileAlt,
                 fileUrl: image.fileUrl,
@@ -153,17 +184,11 @@ const updateDesign = async (req, res) => {
             );
 
             if (model.deletedImages) {
-                const deletedImages = JSON.parse(model.deletedImages);
-                deletedImages.forEach(image => {
-                    const filePath = path.join('public', 'Design', image.fileUrl);
-                    fs.unlink(filePath, (error) => {
-                        if (error) {
-                            console.log(`Error deleting file: ${error}`);
-                        } else {
-                            console.log(`file delete successfully!`);
-                        }
-                    })
-                })
+                const deletedImages = model.deletedImages;
+                for (const img of deletedImages) {
+                    const filePath = path.join('public', 'design', img.fileUrl);
+                    await removeFileSync(filePath);
+                }
             }
             return res.status(200).json({ message: "Successful" });
         }

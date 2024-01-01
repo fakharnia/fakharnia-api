@@ -1,29 +1,29 @@
-const stringValidation = require("../extensions/objectValidation");
 const path = require("path");
-const fs = require("fs");
+const formidable = require('formidable');
 const Resume = require("../model/Resume");
+const { removeFileSync, uploadFileSync, uploadFilesSync } = require("../extensions/uploadExtensions");
+const { objectValidation } = require("../extensions/objectValidation");
 
-const modelValidation = (rawData) => {
+const resumeValidation = (data) => {
     try {
-        const model = stringValidation(rawData);
         let result = true;
 
-        if (!model) {
+        if (!data) {
             result = false;
         }
-        if (model.aboutMe === null || model.aboutMe === undefined || model.aboutMe.length === 0) {
-            result = false;
-        }
-
-        if (model.text === null || model.text === undefined || model.text.length === 0) {
+        if (data.aboutMe === null || data.aboutMe === undefined || data.aboutMe.length === 0) {
             result = false;
         }
 
-        if (model.education === null || model.education === undefined || model.education.length === 0) {
+        if (data.text === null || data.text === undefined || data.text.length === 0) {
             result = false;
         }
 
-        if (model.fileUrl === null || model.fileUrl === undefined || model.fileUrl.length === 0) {
+        if (data.education === null || data.education === undefined || data.education.length === 0) {
+            result = false;
+        }
+
+        if (data.fileUrl === null || data.fileUrl === undefined || data.fileUrl.length === 0) {
             result = false;
         }
 
@@ -33,12 +33,11 @@ const modelValidation = (rawData) => {
     }
 }
 
-const languageValidation = (rawData) => {
+const languageValidation = (data) => {
     try {
-        const model = stringValidation(JSON.parse(rawData));
         let result = true;
 
-        for (const prop of model) {
+        for (const prop of data) {
             if (prop.title === null || prop.title === undefined || prop.title.length === 0) {
                 result = false;
             }
@@ -62,12 +61,11 @@ const languageValidation = (rawData) => {
     }
 }
 
-const contactValidation = (rawData) => {
+const contactValidation = (data) => {
     try {
-        const model = stringValidation(JSON.parse(rawData));
         let result = true;
 
-        for (const prop of model) {
+        for (const prop of data) {
             if (prop.link === null || prop.link === undefined || prop.link.length === 0) {
                 result = false;
             }
@@ -83,12 +81,11 @@ const contactValidation = (rawData) => {
     }
 }
 
-const skillValidation = (rawData) => {
+const skillValidation = (data) => {
     try {
-        const model = stringValidation(JSON.parse(rawData));
         let result = true;
 
-        for (const prop of model) {
+        for (const prop of data) {
             if (prop.title === null || prop.title === undefined || prop.title.length === 0) {
                 result = false;
             }
@@ -118,27 +115,71 @@ const getResume = async (req, res) => {
 
 const updateResume = async (req, res) => {
     try {
+        const form = new formidable.IncomingForm({
+            uploadDir: path.join("public", "temp"),
+        });
+        const [fields, files] = await form.parse(req);
+        const model = objectValidation(fields);
 
-        if (modelValidation(req.body)) {
-            const model = stringValidation(req.body);
-            const contactModel = contactValidation(model.contacts) ? JSON.parse(model.contacts) : [];
-            const languageModel = languageValidation(model.languages) ? JSON.parse(model.languages) : [];
-            const skillModel = skillValidation(model.skills) ? JSON.parse(model.skills) : [];
+        if (resumeValidation(model) && languageValidation(model.languages) && contactValidation(model.contacts) && skillValidation(model.skills)) {
+
+            const fileResult = await uploadFileSync(files, "file", "resume");
+            if (fileResult != undefined) {
+                if (model._id) {
+                    //  remove old avatar file
+                    const resume = await Resume.findById(model._id);
+                    if (resume && resume?.fileUrl) {
+                        await removeFileSync(path.join("public", "resume", resume.fileUrl));
+                    }
+                }
+                model.fileUrl = fileResult;
+            }
+
+            const avatarResult = await uploadFileSync(files, "avatar", "resume");
+            if (avatarResult != undefined) {
+                if (model._id) {
+                    //  remove old avatar file
+                    const resume = await Resume.findById(model._id);
+                    if (resume && resume?.avatarUrl) {
+                        await removeFileSync(path.join("public", "resume", resume.avatarUrl));
+                    }
+                }
+                model.avatarUrl = avatarResult;
+            }
+
+            if (files.contactsFiles && files.contactsFiles.length > 0) {
+                for (let file of files.contactsFiles) {
+                    const result = await uploadFilesSync(file, "resume");
+                    if (result != undefined) {
+                        const foundedContact = model.contacts.findIndex(cnt => cnt.fileUrl === file.originalFilename);
+                        if (foundedContact != -1) {
+                            model.contacts[foundedContact].fileUrl = result;
+                        }
+                    }
+                }
+            }
+
+            if (files.skillsFiles && files.skillsFiles.length > 0) {
+                for (let file of files.skillsFiles) {
+                    const result = await uploadFilesSync(file, "resume");
+                    if (result != undefined) {
+                        const foundedSkill = model.skills.findIndex(skl => skl.fileUrl === file.originalFilename);
+                        if (foundedSkill != -1) {
+                            model.skills[foundedSkill].fileUrl = result;
+                        }
+                    }
+                }
+            }
 
             if (model._id) {
+
 
                 // Delete file if new one uploaded
                 if (model.fileChanged) {
                     const currentData = await Resume.findById(model._id);
                     if (currentData.fileUrl) {
                         const filePath = path.join('public', 'resume', currentData.fileUrl);
-                        fs.unlink(filePath, (error) => {
-                            if (error) {
-                                console.log(`Error deleting file: ${error}`);
-                            } else {
-                                console.log(`file delete successfully!`);
-                            }
-                        })
+                        await removeFileSync(filePath);
                     }
 
 
@@ -149,13 +190,7 @@ const updateResume = async (req, res) => {
                     const currentData = await Resume.findById(model._id);
                     if (currentData.avatarUrl) {
                         const filePath = path.join('public', 'resume', currentData.avatarUrl);
-                        fs.unlink(filePath, (error) => {
-                            if (error) {
-                                console.log(`Error deleting file: ${error}`);
-                            } else {
-                                console.log(`file delete successfully!`);
-                            }
-                        })
+                        await removeFileSync(filePath);
                     }
                 }
 
@@ -169,41 +204,28 @@ const updateResume = async (req, res) => {
                             fileUrl: model.fileUrl,
                             avatarUrl: model.avatarUrl,
                             hobbies: model.hobbies,
-                            contacts: contactModel,
-                            languages: languageModel,
-                            skills: skillModel
+                            contacts: model.contacts,
+                            languages: model.languages,
+                            skills: model.skills
                         }
                     },
                     { new: true }
                 );
 
                 if (model.deletedContacts.length > 0) {
-                    const deletedcContacts = JSON.parse(model.deletedContacts);
-                    deletedcContacts.forEach(contact => {
+                    for (const contact of model.deletedContacts) {
                         const filePath = path.join('public', 'resume', contact);
-                        fs.unlink(filePath, (error) => {
-                            if (error) {
-                                console.log(`Error deleting file: ${error}`);
-                            } else {
-                                console.log(`file delete successfully!`);
-                            }
-                        })
-                    })
+                        await removeFileSync(filePath);
+                    }
                 }
 
                 if (model.deletedSkills.length > 0) {
-                    const deletedSkills = JSON.parse(model.deletedSkills);
-                    deletedSkills.forEach(skill => {
+                    for (const skill of model.deletedSkills) {
                         const filePath = path.join('public', 'resume', skill);
-                        fs.unlink(filePath, (error) => {
-                            if (error) {
-                                console.log(`Error deleting file: ${error}`);
-                            } else {
-                                console.log(`file delete successfully!`);
-                            }
-                        })
-                    })
+                        await removeFileSync(filePath);
+                    }
                 }
+
             } else {
                 await Resume.create(
                     {
@@ -213,9 +235,9 @@ const updateResume = async (req, res) => {
                         fileUrl: model.fileUrl,
                         avatarUrl: model.avatarUrl,
                         hobbies: model.hobbies,
-                        contacts: contactModel,
-                        languages: languageModel,
-                        skills: skillModel
+                        contacts: model.contacts,
+                        languages: model.languages,
+                        skills: model.skills
                     }
                 );
             }
