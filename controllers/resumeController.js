@@ -11,15 +11,33 @@ const resumeValidation = (data) => {
         if (!data) {
             result = false;
         }
-        if (data.aboutMe === null || data.aboutMe === undefined || data.aboutMe.length === 0) {
+        if (data.fa_aboutMe === null || data.fa_aboutMe === undefined || data.fa_aboutMe.length === 0) {
+            result = false;
+        }
+        if (data.en_aboutMe === null || data.en_aboutMe === undefined || data.en_aboutMe.length === 0) {
+            result = false;
+        }
+        if (data.deu_aboutMe === null || data.deu_aboutMe === undefined || data.deu_aboutMe.length === 0) {
             result = false;
         }
 
-        if (data.text === null || data.text === undefined || data.text.length === 0) {
+        if (data.fa_text === null || data.fa_text === undefined || data.fa_text.length === 0) {
+            result = false;
+        }
+        if (data.en_text === null || data.en_text === undefined || data.en_text.length === 0) {
+            result = false;
+        }
+        if (data.deu_text === null || data.deu_text === undefined || data.deu_text.length === 0) {
             result = false;
         }
 
-        if (data.education === null || data.education === undefined || data.education.length === 0) {
+        if (data.fa_education === null || data.fa_education === undefined || data.fa_education.length === 0) {
+            result = false;
+        }
+        if (data.en_education === null || data.en_education === undefined || data.en_education.length === 0) {
+            result = false;
+        }
+        if (data.deu_education === null || data.deu_education === undefined || data.deu_education.length === 0) {
             result = false;
         }
 
@@ -89,9 +107,16 @@ const skillValidation = (data) => {
             if (prop.title === null || prop.title === undefined || prop.title.length === 0) {
                 result = false;
             }
-            if (prop.description === null || prop.description === undefined || prop.description.length === 0) {
+            if (prop.fa_description === null || prop.fa_description === undefined || prop.fa_description.length === 0) {
                 result = false;
             }
+            if (prop.en_description === null || prop.en_description === undefined || prop.en_description.length === 0) {
+                result = false;
+            }
+            if (prop.deu_description === null || prop.deu_description === undefined || prop.deu_description.length === 0) {
+                result = false;
+            }
+
             if (prop.fileUrl === null || prop.fileUrl === undefined || prop.fileUrl.length === 0) {
                 result = false;
             }
@@ -198,12 +223,20 @@ const updateResume = async (req, res) => {
                     { _id: model._id },
                     {
                         $set: {
-                            aboutMe: model.aboutMe,
-                            text: model.text,
-                            education: model.education,
+                            fa_aboutMe: model.fa_aboutMe,
+                            en_aboutMe: model.en_aboutMe,
+                            deu_aboutMe: model.deu_aboutMe,
+                            fa_text: model.fa_text,
+                            en_text: model.en_text,
+                            deu_text: model.deu_text,
+                            fa_education: model.fa_education,
+                            en_education: model.en_education,
+                            deu_education: model.deu_education,
                             fileUrl: model.fileUrl,
                             avatarUrl: model.avatarUrl,
-                            hobbies: model.hobbies,
+                            fa_hobbies: model.fa_hobbies,
+                            en_hobbies: model.en_hobbies,
+                            deu_hobbies: model.deu_hobbies,
                             contacts: model.contacts,
                             languages: model.languages,
                             skills: model.skills
@@ -229,12 +262,20 @@ const updateResume = async (req, res) => {
             } else {
                 await Resume.create(
                     {
-                        aboutMe: model.aboutMe,
-                        text: model.text,
-                        education: model.education,
+                        fa_aboutMe: model.fa_aboutMe,
+                        en_aboutMe: model.en_aboutMe,
+                        deu_aboutMe: model.deu_aboutMe,
+                        fa_text: model.fa_text,
+                        en_text: model.en_text,
+                        deu_text: model.deu_text,
+                        fa_education: model.fa_education,
+                        en_education: model.en_education,
+                        deu_education: model.deu_education,
                         fileUrl: model.fileUrl,
                         avatarUrl: model.avatarUrl,
-                        hobbies: model.hobbies,
+                        fa_hobbies: model.fa_hobbies,
+                        en_hobbies: model.en_hobbies,
+                        deu_hobbies: model.deu_hobbies,
                         contacts: model.contacts,
                         languages: model.languages,
                         skills: model.skills

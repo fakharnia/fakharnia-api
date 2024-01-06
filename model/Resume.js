@@ -16,7 +16,15 @@ const skillSchema = new Schema({
         type: String,
         required: true
     },
-    description: {
+    fa_description: {
+        type: String,
+        required: true
+    },
+    en_description: {
+        type: String,
+        required: true
+    },
+    deu_description: {
         type: String,
         required: true
     },
@@ -66,15 +74,39 @@ const languageSchema = new Schema({
 });
 
 const resumeSchema = new Schema({
-    aboutMe: {
+    fa_aboutMe: {
         type: String,
         required: true
     },
-    text: {
+    en_aboutMe: {
         type: String,
         required: true
     },
-    education: {
+    deu_aboutMe: {
+        type: String,
+        required: true
+    },
+    fa_text: {
+        type: String,
+        required: true
+    },
+    en_text: {
+        type: String,
+        required: true
+    },
+    deu_text: {
+        type: String,
+        required: true
+    },
+    fa_education: {
+        type: String,
+        required: true
+    },
+    en_education: {
+        type: String,
+        required: true
+    },
+    deu_education: {
         type: String,
         required: true
     },
@@ -86,7 +118,13 @@ const resumeSchema = new Schema({
         type: String,
         required: true
     },
-    hobbies: {
+    fa_hobbies: {
+        type: String
+    },
+    en_hobbies: {
+        type: String
+    },
+    deu_hobbies: {
         type: String
     },
     contacts: {
