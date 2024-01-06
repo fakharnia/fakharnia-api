@@ -20,28 +20,35 @@ const updateStatus = async (req, res) => {
         });
         const [fields, files] = await form.parse(req);
 
-        const result = await uploadFileSync(files, "avatar", "avatar");
         const model = objectValidation(fields);
-        if (result != undefined) {
+
+        const result = await uploadFileSync(files, "avatar", "avatar");
+        if (result != undefined && model._id) {
+
             //  remove old avatar file
             const status = await Status.findById(model._id);
             if (status && status?.avatarUrl) {
                 await removeFileSync(path.join("public", "avatar", status.avatarUrl));
             }
-            model.avatarUrl = result;
         }
+        model.avatarUrl = result;
 
         if (model._id) {
             if (model.deleteAvatar) {
                 const directoryPath = path.join("public", "avatar");
                 await removeFilesSync(directoryPath);
+                model.avatarUrl = null;
             }
             await Status.findOneAndUpdate(
                 { _id: model._id },
                 {
                     $set: {
-                        dailyText: model.dailyText,
-                        title: model.title,
+                        fa_text: model.fa_text,
+                        en_text: model.en_text,
+                        deu_text: model.deu_text,
+                        fa_status: model.fa_status,
+                        en_status: model.en_status,
+                        deu_status: model.deu_status,
                         state: model.state,
                         hasAvatar: (model.deleteAvatar && !req.file) ? false : true,
                         avatarUrl: model.avatarUrl
@@ -51,11 +58,15 @@ const updateStatus = async (req, res) => {
             );
         } else {
             model._id = await Status.create({
-                dailyText: model.dailyText,
-                title: model.title,
+                fa_text: model.fa_text,
+                en_text: model.en_text,
+                deu_text: model.deu_text,
+                fa_status: model.fa_status,
+                en_status: model.en_status,
+                deu_status: model.deu_status,
                 state: model.state,
-                hasAvatar: req.file ? true : false,
-                avatarUrl: model.avatarUrl
+                hasAvatar: (model.deleteAvatar && !req.file) ? false : true,
+                avatarUrl: (model.deleteAvatar && !req.file) ? null : model.avatarUrl
             });
         }
 
