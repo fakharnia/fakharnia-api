@@ -12,7 +12,13 @@ const serviceValidation = async (rawData) => {
         if (!model) {
             result = false;
         }
-        if (model.title === null || model.title === undefined || model.title.length === 0) {
+        if (model.fa_title === null || model.fa_title === undefined || model.fa_title.length === 0) {
+            result = false;
+        }
+        if (model.en_title === null || model.en_title === undefined || model.en_title.length === 0) {
+            result = false;
+        }
+        if (model.deu_title === null || model.deu_title === undefined || model.deu_title.length === 0) {
             result = false;
         }
 
@@ -20,7 +26,13 @@ const serviceValidation = async (rawData) => {
             result = false;
         }
 
-        if (model.content === null || model.content === undefined || model.content.length === 0) {
+        if (model.fa_fileUrl === null || model.fa_fileUrl === undefined || model.fa_fileUrl.length === 0) {
+            result = false;
+        }
+        if (model.en_fileUrl === null || model.en_fileUrl === undefined || model.en_fileUrl.length === 0) {
+            result = false;
+        }
+        if (model.deu_fileUrl === null || model.deu_fileUrl === undefined || model.deu_fileUrl.length === 0) {
             result = false;
         }
 
@@ -62,15 +74,34 @@ const createService = async (req, res) => {
         const model = objectValidation(fields);
 
         if (serviceValidation(model)) {
-            const result = await uploadFileSync(files, "cover", "service");
-            if (result != undefined) {
-                model.coverUrl = result;
+            const coverResult = await uploadFileSync(files, "cover", "service");
+            if (coverResult != undefined) {
+                model.coverUrl = coverResult;
             }
 
+            const fa_fileResult = await uploadFileSync(files, "fa_file", "service");
+            if (fa_fileResult != undefined) {
+                model.fa_fileUrl = fa_fileResult;
+            }
+
+            const en_fileResult = await uploadFileSync(files, "en_file", "service");
+            if (en_fileResult != undefined) {
+                model.en_fileUrl = en_fileResult;
+            }
+            const deu_fileResult = await uploadFileSync(files, "deu_file", "service");
+            if (deu_fileResult != undefined) {
+                model.deu_fileUrl = deu_fileResult;
+            }
+
+
             await Service.create({
-                title: model.title,
+                fa_title: model.fa_title,
+                en_title: model.en_title,
+                deu_title: model.deu_title,
                 priority: model.priority,
-                content: model.content,
+                fa_fileUrl: model.fa_fileUrl,
+                en_fileUrl: model.en_fileUrl,
+                deu_fileUrl: model.deu_fileUrl,
                 coverUrl: model.coverUrl,
                 coverAlt: model.coverAlt
             });
@@ -93,23 +124,58 @@ const updateService = async (req, res) => {
         const [fields, files] = await form.parse(req);
         const model = objectValidation(fields);
 
-        const result = await uploadFileSync(files, "cover", "service");
-        if (result != undefined) {
+        const coverResult = await uploadFileSync(files, "cover", "service");
+        if (coverResult != undefined) {
             //  remove old avatar file
             const service = await Service.findById(model._id);
             if (service && service.coverUrl) {
                 await removeFileSync(path.join("public", "service", service.coverUrl));
             }
-            model.coverUrl = result;
+            model.coverUrl = coverResult;
         }
+
+        const fa_fileUrlResult = await uploadFileSync(files, "fa_file", "service");
+        if (fa_fileUrlResult != undefined) {
+            //  remove farsi file
+            const service = await Service.findById(model._id);
+            if (service && service.fa_fileUrl) {
+                await removeFileSync(path.join("public", "service", service.fa_fileUrl));
+            }
+            model.fa_fileUrl = fa_fileUrlResult;
+        }
+
+        const en_fileUrlResult = await uploadFileSync(files, "en_file", "service");
+        if (en_fileUrlResult != undefined) {
+            //  remove farsi file
+            const service = await Service.findById(model._id);
+            if (service && service.en_fileUrl) {
+                await removeFileSync(path.join("public", "service", service.en_fileUrl));
+            }
+            model.en_fileUrl = en_fileUrlResult;
+        }
+
+        const deu_fileUrlResult = await uploadFileSync(files, "deu_file", "service");
+        if (deu_fileUrlResult != undefined) {
+            //  remove farsi file
+            const service = await Service.findById(model._id);
+            if (service && service.deu_fileUrl) {
+                await removeFileSync(path.join("public", "service", service.deu_fileUrl));
+            }
+            model.deu_fileUrl = deu_fileUrlResult;
+        }
+
         if (serviceValidation(model)) {
             await Service.findOneAndUpdate(
                 { _id: model._id },
                 {
                     $set: {
-                        title: model.title,
+                        fa_title: model.fa_title,
+                        en_title: model.en_title,
+                        deu_title: model.deu_title,
                         priority: model.priority,
-                        content: model.content,
+                        fa_fileUrl: model.fa_fileUrl,
+                        en_fileUrl: model.en_fileUrl,
+                        deu_fileUrl: model.deu_fileUrl,
                         coverUrl: model.coverUrl,
                         coverAlt: model.coverAlt
                     }
@@ -136,6 +202,19 @@ const deleteService = async (req, res) => {
                 const filePath = path.join('public', 'service', service.coverUrl);
                 await removeFileSync(filePath);
             }
+            if (service.fa_fileUrl) {
+                const filePath = path.join('public', 'service', service.fa_fileUrl);
+                await removeFileSync(filePath);
+            }
+            if (service.en_fileUrl) {
+                const filePath = path.join('public', 'service', service.en_fileUrl);
+                await removeFileSync(filePath);
+            }
+            if (service.deu_fileUrl) {
+                const filePath = path.join('public', 'service', service.deu_fileUrl);
+                await removeFileSync(filePath);
+            }
+
             await Service.deleteOne({ _id: serviceId });
             return res.status(200).json({ message: "Successfully deleted!" });
         }
