@@ -6,14 +6,30 @@ const technologySchema = new Schema({
         type: String,
         required: true,
     },
-    description: {
+    fa_description: {
+        type: String,
+        required: false,
+    },
+    en_description: {
+        type: String,
+        required: false,
+    },
+    deu_description: {
         type: String,
         required: false,
     }
 });
 
 const projectSchema = new Schema({
-    name: {
+    fa_name: {
+        type: String,
+        required: true,
+    },
+    en_name: {
+        type: String,
+        required: true,
+    },
+    deu_name: {
         type: String,
         required: true,
     },
@@ -22,7 +38,15 @@ const projectSchema = new Schema({
         required: false
 
     },
-    description: {
+    fa_description: {
+        type: String,
+        required: true,
+    },
+    en_description: {
+        type: String,
+        required: true,
+    },
+    deu_description: {
         type: String,
         required: true,
     },
@@ -36,7 +60,15 @@ const projectSchema = new Schema({
     logoAlt: {
         type: String
     },
-    techDescription: {
+    fa_techDescription: {
+        type: String,
+        required: true,
+    },
+    en_techDescription: {
+        type: String,
+        required: true,
+    },
+    deu_techDescription: {
         type: String,
         required: true,
     },

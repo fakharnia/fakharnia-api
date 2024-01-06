@@ -12,26 +12,38 @@ const projectValidation = (rawData) => {
         if (!model) {
             result = false;
         }
-        if (model.name === null || model.name === undefined || model.name.length === 0) {
+        if (model.fa_name === null || model.fa_name === undefined || model.fa_name.length === 0) {
+            result = false;
+        }
+        if (model.en_name === null || model.en_name === undefined || model.en_name.length === 0) {
+            result = false;
+        }
+        if (model.deu_name === null || model.deu_name === undefined || model.deu_name.length === 0) {
+            result = false;
+        }
+        if (model.fa_description === null || model.fa_description === undefined || model.fa_description.length === 0) {
+            result = false;
+        }
+        if (model.en_description === null || model.en_description === undefined || model.en_description.length === 0) {
+            result = false;
+        }
+        if (model.deu_description === null || model.deu_description === undefined || model.deu_description.length === 0) {
             result = false;
         }
 
-        if (model.priority === null || model.priority === undefined || isNaN(model.priority)) {
+        if (model.fa_techDescription === null || model.fa_techDescription === undefined || model.fa_techDescription.length === 0) {
             result = false;
         }
-
-        if (model.description === null || model.description === undefined || model.description.length === 0) {
+        if (model.en_techDescription === null || model.en_techDescription === undefined || model.en_techDescription.length === 0) {
             result = false;
         }
-
-        if (model.techDescription === null || model.techDescription === undefined || model.techDescription.length === 0) {
+        if (model.deu_techDescription === null || model.deu_techDescription === undefined || model.deu_techDescription.length === 0) {
             result = false;
         }
 
         if (model.logoUrl === null || model.logoUrl === undefined || model.logoUrl.length === 0) {
             result = false;
         }
-
         return result;
     } catch (error) {
         return false;
@@ -93,13 +105,19 @@ const createProject = async (req, res) => {
                 model.logoUrl = result;
             }
             const project = new Project({
-                name: model.name,
+                fa_name: model.fa_name,
+                en_name: model.en_name,
+                deu_name: model.deu_name,
                 priority: model.priority,
-                description: model.description,
+                fa_description: model.fa_description,
+                en_description: model.en_description,
+                deu_description: model.deu_description,
                 url: model.url,
                 logoUrl: model.logoUrl,
                 logoAlt: model.logoAlt,
-                techDescription: model.techDescription,
+                fa_techDescription: model.fa_techDescription,
+                en_techDescription: model.en_techDescription,
+                deu_techDescription: model.deu_techDescription,
                 technologies: model.technologies
             });
             await project.save();
@@ -137,13 +155,19 @@ const updateProject = async (req, res) => {
                 { _id: model._id },
                 {
                     $set: {
-                        name: model.name,
+                        fa_name: model.fa_name,
+                        en_name: model.en_name,
+                        deu_name: model.deu_name,
                         priority: model.priority,
-                        description: model.description,
+                        fa_description: model.fa_description,
+                        en_description: model.en_description,
+                        deu_description: model.deu_description,
                         url: model.url,
                         logoUrl: model.logoUrl,
                         logoAlt: model.logoAlt,
-                        techDescription: model.techDescription,
+                        fa_techDescription: model.fa_techDescription,
+                        en_techDescription: model.en_techDescription,
+                        deu_techDescription: model.deu_techDescription,
                         technologies: model.technologies
                     }
                 },
