@@ -29,7 +29,7 @@ app.use(express.urlencoded({ extended: true }));
 app.use(cookieParser());
 app.use('/public', express.static('public'));
 app.use("/api/authentication", require("./routes/authenticationRouter"));
-app.use("/api/blog", require("./routes/blogRouter"));
+app.use("/api/post", require("./routes/postRouter"));
 app.use("/api/status", require("./routes/statusRouter"));
 app.use("/api/service", require("./routes/serviceRouter"));
 app.use("/api/project", require("./routes/projectRouter"));

@@ -13,6 +13,9 @@ const mongoose = require('mongoose');
  */
 const uploadFileSync = async (files, property, folderName) => {
     try {
+        if (!fs.existsSync(path.join("public", folderName))) {
+            fs.mkdirSync(path.join("public", folderName), { recursive: true });
+        }
         if (files[property] && files[property].length === 1) {
             let id = new mongoose.Types.ObjectId();
 
@@ -99,13 +102,17 @@ const removeFileSync = async (path) => {
  * @param {string} directory - directory address
  * @returns {boolean} - Return true if successfuly and false if not
  */
-const removeFilesSync = async (directory) => {
+const removeFilesSync = async (directory, removeDirectory = false) => {
     try {
         const files = await fs.readdirSync(directory);
 
         for (const file of files) {
-            const filePath = path.join(directoryPath, file);
+            const filePath = path.join(directory, file);
             await fs.unlinkSync(filePath);
+        }
+
+        if (removeDirectory) {
+            fs.rmSync(directory, { recursive: true, force: true });
         }
         return true;
     } catch (error) {

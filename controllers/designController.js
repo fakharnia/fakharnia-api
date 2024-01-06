@@ -2,7 +2,7 @@ const { objectValidation } = require("../extensions/objectValidation");
 const path = require("path");
 const fs = require("fs");
 const formidable = require('formidable');
-const { Design, UiImage } = require("../model/Design");
+const { Design } = require("../model/Design");
 const { removeFileSync, uploadFilesSync } = require("../extensions/uploadExtensions");
 
 const designValidation = (rawData) => {
