@@ -41,9 +41,14 @@ const projectValidation = (rawData) => {
             result = false;
         }
 
-        if (model.logoUrl === null || model.logoUrl === undefined || model.logoUrl.length === 0) {
+        if (model.lightLogoUrl === null || model.lightLogoUrl === undefined || model.lightLogoUrl.length === 0) {
             result = false;
         }
+
+        if (model.darkLogoUrl === null || model.darkLogoUrl === undefined || model.darkLogoUrl.length === 0) {
+            result = false;
+        }
+        console.log(result);
         return result;
     } catch (error) {
         return false;
@@ -74,8 +79,9 @@ const projectTechnologiesValidation = (rawData) => {
 
 const getProjects = async (req, res) => {
     try {
-        const Projects = await Project.find();
-        return res.status(200).json(Projects);
+        const projects = await Project.find().sort({ priority: 1 });
+        console.log(projects);
+        return res.status(200).json(projects);
     } catch (error) {
         return res.status(500).json(error);
     }
@@ -100,20 +106,28 @@ const createProject = async (req, res) => {
         const model = objectValidation(fields);
         if (projectValidation(model) && projectTechnologiesValidation(model.technologies)) {
 
-            const result = await uploadFileSync(files, "logo", "project");
-            if (result != undefined) {
-                model.logoUrl = result;
+            const lightLogoResult = await uploadFileSync(files, "lightLogo", "project");
+            if (lightLogoResult != undefined) {
+                model.lightLogoUrl = lightLogoResult;
             }
+
+            const darkLogoResult = await uploadFileSync(files, "darkLogo", "project");
+            if (darkLogoResult != undefined) {
+                model.darkLogoUrl = darkLogoResult;
+            }
+
             const project = new Project({
                 fa_name: model.fa_name,
                 en_name: model.en_name,
                 deu_name: model.deu_name,
+                key: model.key,
                 priority: model.priority,
                 fa_description: model.fa_description,
                 en_description: model.en_description,
                 deu_description: model.deu_description,
                 url: model.url,
-                logoUrl: model.logoUrl,
+                lightLogoUrl: model.lightLogoUrl,
+                darkLogoUrl: model.darkLogoUrl,
                 logoAlt: model.logoAlt,
                 fa_techDescription: model.fa_techDescription,
                 en_techDescription: model.en_techDescription,
@@ -140,17 +154,29 @@ const updateProject = async (req, res) => {
         });
         const [fields, files] = await form.parse(req);
         const model = objectValidation(fields);
+        console.log(files);
         if (projectValidation(model) && projectTechnologiesValidation(model.technologies)) {
 
-            const result = await uploadFileSync(files, "logo", "project");
-            if (result != undefined) {
+            const lightLogoResult = await uploadFileSync(files, "lightLogo", "project");
+            if (lightLogoResult != undefined) {
                 //  remove old avatar file
                 const project = await Project.findById(model._id);
-                if (project && project.logoUrl) {
-                    await removeFileSync(path.join("public", "project", project.logoUrl));
+                if (project && project.lightLogoUrl) {
+                    await removeFileSync(path.join("public", "project", project.lightLogoUrl));
                 }
-                model.logoUrl = result;
+                model.lightLogoUrl = lightLogoResult;
             }
+
+            const darkLogoResult = await uploadFileSync(files, "darkLogo", "project");
+            if (darkLogoResult != undefined) {
+                //  remove old avatar file
+                const project = await Project.findById(model._id);
+                if (project && project.darkLogoUrl) {
+                    await removeFileSync(path.join("public", "project", project.darkLogoUrl));
+                }
+                model.darkLogoUrl = darkLogoResult;
+            }
+
             await Project.findOneAndUpdate(
                 { _id: model._id },
                 {
@@ -158,12 +184,14 @@ const updateProject = async (req, res) => {
                         fa_name: model.fa_name,
                         en_name: model.en_name,
                         deu_name: model.deu_name,
+                        key: model.key,
                         priority: model.priority,
                         fa_description: model.fa_description,
                         en_description: model.en_description,
                         deu_description: model.deu_description,
                         url: model.url,
-                        logoUrl: model.logoUrl,
+                        lightLogoUrl: model.lightLogoUrl,
+                        darkLogoUrl: model.darkLogoUrl,
                         logoAlt: model.logoAlt,
                         fa_techDescription: model.fa_techDescription,
                         en_techDescription: model.en_techDescription,
@@ -187,8 +215,12 @@ const deleteProject = async (req, res) => {
         const { projectId } = req.params;
         if (projectId) {
             const project = await Project.findOne({ _id: projectId });
-            if (project.logoUrl) {
-                const filePath = path.join('public', 'project', project.logoUrl);
+            if (project.lightLogoUrl) {
+                const filePath = path.join('public', 'project', project.lightLogoUrl);
+                await removeFileSync(filePath);
+            }
+            if (project.darkLogoUrl) {
+                const filePath = path.join('public', 'project', project.darkLogoUrl);
                 await removeFileSync(filePath);
             }
             await Project.deleteOne({ _id: projectId });

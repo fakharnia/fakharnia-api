@@ -33,6 +33,10 @@ const projectSchema = new Schema({
         type: String,
         required: true,
     },
+    key: {
+        type: String,
+        required: true
+    },
     priority: {
         type: Number,
         required: false
@@ -53,7 +57,11 @@ const projectSchema = new Schema({
     url: {
         type: String
     },
-    logoUrl: {
+    lightLogoUrl: {
+        type: String,
+        required: false
+    },
+    darkLogoUrl: {
         type: String,
         required: false
     },
@@ -75,6 +83,7 @@ const projectSchema = new Schema({
     technologies: {
         type: [technologySchema],
         default: [],
+        required: false
     },
 });
 

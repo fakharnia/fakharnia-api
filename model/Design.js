@@ -19,7 +19,19 @@ const uiImageSchema = new Schema({
 });
 
 const designSchema = new Schema({
-    title: {
+    fa_title: {
+        type: String,
+        required: true
+    },
+    en_title: {
+        type: String,
+        required: true
+    },
+    deu_title: {
+        type: String,
+        required: true
+    },
+    key: {
         type: String,
         required: true
     },
@@ -27,7 +39,15 @@ const designSchema = new Schema({
         type: Number,
         required: true
     },
-    description: {
+    fa_description: {
+        type: String,
+        required: true
+    },
+    en_description: {
+        type: String,
+        required: true
+    },
+    deu_description: {
         type: String,
         required: true
     },

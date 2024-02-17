@@ -13,7 +13,15 @@ const designValidation = (rawData) => {
         if (!model) {
             result = false;
         }
-        if (model.title === null || model.title === undefined || model.title.length === 0) {
+        if (model.fa_title === null || model.fa_title === undefined || model.fa_title.length === 0) {
+            result = false;
+        }
+
+        if (model.en_title === null || model.en_title === undefined || model.en_title.length === 0) {
+            result = false;
+        }
+
+        if (model.deu_title === null || model.deu_title === undefined || model.deu_title.length === 0) {
             result = false;
         }
 
@@ -21,7 +29,15 @@ const designValidation = (rawData) => {
             result = false;
         }
 
-        if (model.description === null || model.description === undefined || model.description.length === 0) {
+        if (model.fa_description === null || model.fa_description === undefined || model.fa_description.length === 0) {
+            result = false;
+        }
+
+        if (model.en_description === null || model.en_description === undefined || model.en_description.length === 0) {
+            result = false;
+        }
+
+        if (model.deu_description === null || model.deu_description === undefined || model.deu_description.length === 0) {
             result = false;
         }
 
@@ -75,9 +91,13 @@ const getDesigns = async (req, res) => {
             }
             return {
                 _id: ds._id,
-                title: ds.title,
+                fa_title: ds.fa_title,
+                en_title: ds.en_title,
+                deu_title: ds.deu_title,
                 priority: ds.priority,
-                description: ds.description,
+                fa_description: ds.fa_description,
+                en_description: ds.en_description,
+                deu_description: ds.deu_description,
                 coverUrl: cover,
                 images: ds.images
             };
@@ -126,9 +146,14 @@ const createDesign = async (req, res) => {
             }));
 
             await Design.create({
-                title: model.title,
+                fa_title: model.fa_title,
+                en_title: model.en_title,
+                deu_title: model.deu_title,
+                key: model.key,
                 priority: model.priority,
-                description: model.description,
+                fa_description: model.fa_description,
+                en_description: model.en_description,
+                deu_description: model.deu_description,
                 images: images ?? []
             });
 
@@ -174,9 +199,14 @@ const updateDesign = async (req, res) => {
                 { _id: model._id },
                 {
                     $set: {
-                        title: model.title,
+                        fa_title: model.fa_title,
+                        en_title: model.en_title,
+                        deu_title: model.deu_title,
+                        key: model.key,
                         priority: model.priority,
-                        description: model.description,
+                        fa_description: model.fa_description,
+                        en_description: model.en_description,
+                        deu_description: model.deu_description,
                         images: images ?? []
                     }
                 },
