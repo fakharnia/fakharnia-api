@@ -31,6 +31,23 @@ commentSchema.pre("save", function (next) {
     next();
 })
 
+const viewSchema = new Schema({
+    createdAt: {
+        type: Date,
+    },
+    ip: {
+        type: String,
+    }
+});
+
+viewSchema.pre("save", function (next) {
+
+    if (!this.createdAt) {
+        this.createdAt = new Date();
+    }
+    next();
+})
+
 const postSchema = new Schema({
     fa_title: {
         type: String,
@@ -80,7 +97,7 @@ const postSchema = new Schema({
         required: true
     },
     Views: {
-        type: [String]
+        type: [viewSchema]
     },
     Shares: {
         type: [String]
