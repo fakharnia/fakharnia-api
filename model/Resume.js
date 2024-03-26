@@ -26,7 +26,7 @@ const skillSchema = new Schema({
     },
     deu_description: {
         type: String,
-        required: true
+        required: false
     },
     rate: {
         type: Number
@@ -84,7 +84,7 @@ const resumeSchema = new Schema({
     },
     deu_aboutMe: {
         type: String,
-        required: true
+        required: false
     },
     fa_text: {
         type: String,
@@ -96,7 +96,7 @@ const resumeSchema = new Schema({
     },
     deu_text: {
         type: String,
-        required: true
+        required: false
     },
     fa_education: {
         type: String,
@@ -108,7 +108,7 @@ const resumeSchema = new Schema({
     },
     deu_education: {
         type: String,
-        required: true
+        required: false
     },
     fileUrl: {
         type: String,
