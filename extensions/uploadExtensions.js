@@ -60,6 +60,10 @@ const uploadFilesSync = async (file, folderName) => {
 
         let filename = `${id}${path.extname(file.originalFilename)}`;
 
+        if (!fs.existsSync(path.join("public", folderName))) {
+            fs.mkdirSync(path.join("public", folderName), { recursive: true });
+        }
+
         // Check if file with this name exist
         while (fs.existsSync(path.join("public", folderName, filename))) {
             id = new mongoose.Types.ObjectId();
@@ -87,7 +91,7 @@ const uploadFilesSync = async (file, folderName) => {
  */
 const removeFileSync = async (path) => {
     try {
-        await fs.unlinkSync(path);
+        await fs.rmSync(path, { recursive: true });
         return true;
     } catch (error) {
         console.log(error);
@@ -108,7 +112,7 @@ const removeFilesSync = async (directory, removeDirectory = false) => {
 
         for (const file of files) {
             const filePath = path.join(directory, file);
-            await fs.unlinkSync(filePath);
+            await fs.rmSync(filePath, { recursive: true });
         }
 
         if (removeDirectory) {

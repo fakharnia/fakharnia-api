@@ -31,7 +31,7 @@ const projectSchema = new Schema({
     },
     deu_name: {
         type: String,
-        required: true,
+        required: false,
     },
     key: {
         type: String,
@@ -52,7 +52,7 @@ const projectSchema = new Schema({
     },
     deu_description: {
         type: String,
-        required: true,
+        required: false,
     },
     url: {
         type: String
@@ -78,7 +78,7 @@ const projectSchema = new Schema({
     },
     deu_techDescription: {
         type: String,
-        required: true,
+        required: false,
     },
     technologies: {
         type: [technologySchema],

@@ -18,26 +18,17 @@ const projectValidation = (rawData) => {
         if (model.en_name === null || model.en_name === undefined || model.en_name.length === 0) {
             result = false;
         }
-        if (model.deu_name === null || model.deu_name === undefined || model.deu_name.length === 0) {
-            result = false;
-        }
+
         if (model.fa_description === null || model.fa_description === undefined || model.fa_description.length === 0) {
             result = false;
         }
         if (model.en_description === null || model.en_description === undefined || model.en_description.length === 0) {
             result = false;
         }
-        if (model.deu_description === null || model.deu_description === undefined || model.deu_description.length === 0) {
-            result = false;
-        }
-
         if (model.fa_techDescription === null || model.fa_techDescription === undefined || model.fa_techDescription.length === 0) {
             result = false;
         }
         if (model.en_techDescription === null || model.en_techDescription === undefined || model.en_techDescription.length === 0) {
-            result = false;
-        }
-        if (model.deu_techDescription === null || model.deu_techDescription === undefined || model.deu_techDescription.length === 0) {
             result = false;
         }
 
@@ -48,7 +39,6 @@ const projectValidation = (rawData) => {
         if (model.darkLogoUrl === null || model.darkLogoUrl === undefined || model.darkLogoUrl.length === 0) {
             result = false;
         }
-        console.log(result);
         return result;
     } catch (error) {
         return false;
@@ -80,7 +70,6 @@ const projectTechnologiesValidation = (rawData) => {
 const getProjects = async (req, res) => {
     try {
         const projects = await Project.find().sort({ priority: 1 });
-        console.log(projects);
         return res.status(200).json(projects);
     } catch (error) {
         return res.status(500).json(error);
@@ -154,7 +143,6 @@ const updateProject = async (req, res) => {
         });
         const [fields, files] = await form.parse(req);
         const model = objectValidation(fields);
-        console.log(files);
         if (projectValidation(model) && projectTechnologiesValidation(model.technologies)) {
 
             const lightLogoResult = await uploadFileSync(files, "lightLogo", "project");

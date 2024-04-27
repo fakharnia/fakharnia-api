@@ -9,24 +9,15 @@ const skillSchema = new Schema({
     priority: {
         type: Number
     },
+    iconClass: {
+        type: String
+    },
     fileAlt: {
         type: String
     },
     fileUrl: {
         type: String,
         required: true
-    },
-    fa_description: {
-        type: String,
-        required: true
-    },
-    en_description: {
-        type: String,
-        required: true
-    },
-    deu_description: {
-        type: String,
-        required: false
     },
     rate: {
         type: Number
@@ -38,38 +29,12 @@ const contactSchema = new Schema({
         type: String,
         required: true
     },
-    fileAlt: {
-        type: String
-    },
-    fileUrl: {
-        type: String,
+    iconClass: {
+        type:String,
         required: true
     },
     priority: {
         type: Number
-    }
-});
-
-const languageSchema = new Schema({
-    title: {
-        type: String,
-        required: true
-    },
-    speakingRate: {
-        type: Number,
-        required: true
-    },
-    readingRate: {
-        type: Number,
-        required: true
-    },
-    writingRate: {
-        type: Number,
-        required: true
-    },
-    listeningRate: {
-        type: Number,
-        required: true
     }
 });
 
@@ -98,18 +63,6 @@ const resumeSchema = new Schema({
         type: String,
         required: false
     },
-    fa_education: {
-        type: String,
-        required: true
-    },
-    en_education: {
-        type: String,
-        required: true
-    },
-    deu_education: {
-        type: String,
-        required: false
-    },
     fileUrl: {
         type: String,
         required: true
@@ -118,20 +71,8 @@ const resumeSchema = new Schema({
         type: String,
         required: true
     },
-    fa_hobbies: {
-        type: String
-    },
-    en_hobbies: {
-        type: String
-    },
-    deu_hobbies: {
-        type: String
-    },
     contacts: {
         type: [contactSchema]
-    },
-    languages: {
-        type: [languageSchema]
     },
     skills: {
         type: [skillSchema]

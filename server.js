@@ -2,6 +2,7 @@ require("dotenv").config();
 const path = require("path");
 const express = require("express");
 const app = express();
+const fs = require('fs');
 const corsOptions = require("./config/corsOptions");
 const cors = require("cors");
 const credentials = require("./middleware/credentials");
@@ -12,6 +13,7 @@ const PORT = process.env.PORT || 5000;
 
 const mongoose = require("mongoose");
 const connectDB = require("./config/dbConfig");
+const seedData = require("./extensions/seedData");
 
 connectDB();
 
@@ -37,7 +39,14 @@ app.use("/api/design", require("./routes/designRouter"));
 app.use("/api/resume", require("./routes/resumeRouter"));
 app.get("/", (req, res, next) => res.json({ "message": "There is nothing for you kiddo!" }));
 
-mongoose.connection.once("open", () => {
+mongoose.connection.once("open", async () => {
     console.log("Connected to MongoDB");
+    if (!fs.existsSync(path.join("public"))) {
+        fs.mkdirSync(path.join("public"), { recursive: true });
+    }
+    if (!fs.existsSync(path.join("public", "temp"))) {
+        fs.mkdirSync(path.join("public", "temp"), { recursive: true });
+    }
+    await seedData();
     app.listen(PORT, () => { console.log(`Server running on port ${PORT}`) });
 });

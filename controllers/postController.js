@@ -4,7 +4,7 @@ const fs = require("fs");
 const formidable = require('formidable');
 const mongoose = require('mongoose');
 const Post = require("../model/Post");
-const { uploadFileSync, removeFilesSync } = require("../extensions/uploadExtensions");
+const { uploadFileSync, removeFileSync } = require("../extensions/uploadExtensions");
 
 const postValidation = async (data) => {
     try {
@@ -93,10 +93,6 @@ const createPost = async (req, res) => {
             const deu_fileName = await uploadFileSync(files, "deu_file", `post/${postId}`);
             const coverName = await uploadFileSync(files, "cover", `post/${postId}`);
 
-            // calculate estimated time of article here...
-            const estimateTimeInMinutes = 10;
-
-
             await Post.create({
                 _id: postId,
                 fa_title: model.fa_title,
@@ -107,7 +103,7 @@ const createPost = async (req, res) => {
                 deu_fileUrl: deu_fileName ?? null,
                 coverUrl: coverName ?? null,
                 coverAlt: model.coverAlt,
-                estimateTimeInMinutes: estimateTimeInMinutes,
+                estimateTimeInMinutes: model.estimateTimeInMinutes,
                 tags: model.tags
             });
 
@@ -130,21 +126,28 @@ const updatePost = async (req, res) => {
 
         if (postValidation(model)) {
 
+            const dbModel = await Post.findOne({ _id: model._id });
+
             if (model.fa_fileChanged) {
                 model.fa_fileUrl = await uploadFileSync(files, "fa_file", `post/${model._id}`);
+                const filePath = path.join('public', 'post', model._id.toString(), dbModel.fa_fileUrl);
+                await removeFileSync(filePath);
             }
             if (model.en_fileChanged) {
                 model.en_fileUrl = await uploadFileSync(files, "en_file", `post/${model._id}`);
+                const filePath = path.join('public', 'post', model._id.toString(), dbModel.en_fileUrl);
+                await removeFileSync(filePath);
             }
             if (model.deu_fileChanged) {
                 model.deu_fileUrl = await uploadFileSync(files, "deu_file", `post/${model._id}`);
+                const filePath = path.join('public', 'post', model._id.toString(), dbModel.deu_fileUrl);
+                await removeFileSync(filePath);
             }
             if (model.coverChanged) {
                 model.coverUrl = await uploadFileSync(files, "cover", `post/${model._id}`);
+                const filePath = path.join('public', 'post', model._id.toString(), dbModel.coverUrl);
+                await removeFileSync(filePath);
             }
-
-            // calculate estimated time of article here...
-            const estimateTimeInMinutes = 10;
 
             await Post.findOneAndUpdate(
                 { _id: model._id },
@@ -158,7 +161,7 @@ const updatePost = async (req, res) => {
                         deu_fileUrl: model.deu_fileUrl ?? null,
                         coverUrl: model.coverUrl ?? null,
                         coverAlt: model.coverAlt,
-                        estimateTimeInMinutes: estimateTimeInMinutes,
+                        estimateTimeInMinutes: model.estimateTimeInMinutes,
                         tags: model.tags
                     },
                 },
@@ -185,9 +188,8 @@ const deletePost = async (req, res) => {
                     },
                 },
                 { new: true });
-            // const post = await Post.findOne({ _id: postId });
-            // const filePath = path.join('public', 'post', postId);
-            // await removeFilesSync(filePath, true);
+            const filePath = path.join('public', 'post', postId.toString());
+            await removeFileSync(filePath, true);
             // await Post.deleteOne({ _id: postId });
         }
         return res.status(200).json({ message: "Successfully deleted!" });

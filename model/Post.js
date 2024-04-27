@@ -59,7 +59,7 @@ const postSchema = new Schema({
     },
     deu_title: {
         type: String,
-        required: true
+        required: false
     },
     createdAt: {
         type: Date
@@ -94,7 +94,7 @@ const postSchema = new Schema({
     },
     tags: {
         type: [String],
-        required: true
+        required: false
     },
     Views: {
         type: [viewSchema]

@@ -12,7 +12,7 @@ const serviceSchema = new Schema({
     },
     deu_title: {
         type: String,
-        required: true
+        required: false
     },
     priority: {
         type: Number,
@@ -28,7 +28,7 @@ const serviceSchema = new Schema({
     },
     deu_fileUrl: {
         type: String,
-        required: true
+        required: false
     },
     coverUrl: {
         type: String,

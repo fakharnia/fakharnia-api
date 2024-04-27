@@ -29,7 +29,7 @@ const designSchema = new Schema({
     },
     deu_title: {
         type: String,
-        required: true
+        required: false
     },
     key: {
         type: String,
@@ -49,7 +49,7 @@ const designSchema = new Schema({
     },
     deu_description: {
         type: String,
-        required: true
+        required: false
     },
     images: {
         type: [uiImageSchema]

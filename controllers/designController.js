@@ -235,7 +235,7 @@ const deleteDesign = async (req, res) => {
             const design = await Design.findOne({ _id: designId });
             if (design.images) {
                 design.images.forEach(img => {
-                    const filePath = path.join('public', 'Design', img.fileUrl);
+                    const filePath = path.join('public', 'design', img.fileUrl);
                     if (img.fileUrl) {
                         fs.unlink(filePath, (error) => {
                             if (error) {
