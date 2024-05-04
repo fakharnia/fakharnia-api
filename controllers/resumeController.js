@@ -17,17 +17,11 @@ const resumeValidation = (data) => {
         if (data.en_aboutMe === null || data.en_aboutMe === undefined || data.en_aboutMe.length === 0) {
             result = false;
         }
-        if (data.deu_aboutMe === null || data.deu_aboutMe === undefined || data.deu_aboutMe.length === 0) {
-            result = false;
-        }
 
         if (data.fa_text === null || data.fa_text === undefined || data.fa_text.length === 0) {
             result = false;
         }
         if (data.en_text === null || data.en_text === undefined || data.en_text.length === 0) {
-            result = false;
-        }
-        if (data.deu_text === null || data.deu_text === undefined || data.deu_text.length === 0) {
             result = false;
         }
 

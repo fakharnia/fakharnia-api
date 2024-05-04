@@ -21,10 +21,6 @@ const designValidation = (rawData) => {
             result = false;
         }
 
-        if (model.deu_title === null || model.deu_title === undefined || model.deu_title.length === 0) {
-            result = false;
-        }
-
         if (model.priority === null || model.priority === undefined || isNaN(model.priority)) {
             result = false;
         }
@@ -37,9 +33,6 @@ const designValidation = (rawData) => {
             result = false;
         }
 
-        if (model.deu_description === null || model.deu_description === undefined || model.deu_description.length === 0) {
-            result = false;
-        }
 
         if (model.imagesData === null || model.imagesData === undefined || model.imagesData.length === 0) {
             result = false;
