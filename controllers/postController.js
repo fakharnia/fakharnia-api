@@ -30,6 +30,18 @@ const postValidation = async (data) => {
         if (data.tags === null || data.tags === undefined || data.tags.length === 0) {
             result = false;
         }
+        if (data.fa_metatag_title === null || data.fa_metatag_title === undefined || data.fa_metatag_title.length === 0) {
+            result = false;
+        }
+        if (data.en_metatag_title === null || data.en_metatag_title === undefined || data.en_metatag_title.length === 0) {
+            result = false;
+        }
+        if (data.fa_metatag_description === null || data.fa_metatag_description === undefined || data.fa_metatag_description.length === 0) {
+            result = false;
+        }
+        if (data.en_metatag_description === null || data.en_metatag_description === undefined || data.en_metatag_description.length === 0) {
+            result = false;
+        }
         return result;
 
     } catch (error) {
@@ -104,7 +116,11 @@ const createPost = async (req, res) => {
                 coverUrl: coverName ?? null,
                 coverAlt: model.coverAlt,
                 estimateTimeInMinutes: model.estimateTimeInMinutes,
-                tags: model.tags
+                tags: model.tags,
+                fa_metatag_title: model.fa_metatag_title,
+                en_metatag_title: model.en_metatag_title,
+                fa_metatag_description: model.fa_metatag_description,
+                en_metatag_description: model.en_metatag_description
             });
 
             return res.status(200).json({ message: "Successful" });
@@ -162,7 +178,12 @@ const updatePost = async (req, res) => {
                         coverUrl: model.coverUrl ?? null,
                         coverAlt: model.coverAlt,
                         estimateTimeInMinutes: model.estimateTimeInMinutes,
-                        tags: model.tags
+                        tags: model.tags,
+                        fa_metatag_title: model.fa_metatag_title,
+                        en_metatag_title: model.en_metatag_title,
+                        fa_metatag_description: model.fa_metatag_description,
+                        en_metatag_description: model.en_metatag_description
+
                     },
                 },
                 { new: true });

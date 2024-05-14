@@ -85,6 +85,23 @@ const projectSchema = new Schema({
         default: [],
         required: false
     },
+    fa_metatag_title: {
+        type: String,
+        required: true
+    },
+    en_metatag_title: {
+        type: String,
+        required: true
+    },
+    fa_metatag_description: {
+        type: String,
+        required: true
+    },
+    en_metatag_description: {
+        type: String,
+        required: true
+    }
+
 });
 
 module.exports = mongoose.model("Project", projectSchema);

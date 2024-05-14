@@ -39,6 +39,19 @@ const projectValidation = (rawData) => {
         if (model.darkLogoUrl === null || model.darkLogoUrl === undefined || model.darkLogoUrl.length === 0) {
             result = false;
         }
+        if (model.fa_metatag_title === null || model.fa_metatag_title === undefined || model.fa_metatag_title.length === 0) {
+            result = false;
+        }
+        if (model.en_metatag_title === null || model.en_metatag_title === undefined || model.en_metatag_title.length === 0) {
+            result = false;
+        }
+        if (model.fa_metatag_description === null || model.fa_metatag_description === undefined || model.fa_metatag_description.length === 0) {
+            result = false;
+        }
+        if (model.en_metatag_description === null || model.en_metatag_description === undefined || model.en_metatag_description.length === 0) {
+            result = false;
+        }
+
         return result;
     } catch (error) {
         return false;
@@ -121,7 +134,12 @@ const createProject = async (req, res) => {
                 fa_techDescription: model.fa_techDescription,
                 en_techDescription: model.en_techDescription,
                 deu_techDescription: model.deu_techDescription,
-                technologies: model.technologies
+                technologies: model.technologies,
+                fa_metatag_title: model.fa_metatag_title,
+                en_metatag_title: model.en_metatag_title,
+                fa_metatag_description: model.fa_metatag_description,
+                en_metatag_description: model.en_metatag_description        
+
             });
             await project.save();
             return res.status(200).json({ message: "Successfully Created!" });
@@ -184,7 +202,11 @@ const updateProject = async (req, res) => {
                         fa_techDescription: model.fa_techDescription,
                         en_techDescription: model.en_techDescription,
                         deu_techDescription: model.deu_techDescription,
-                        technologies: model.technologies
+                        technologies: model.technologies,
+                        fa_metatag_title: model.fa_metatag_title,
+                        en_metatag_title: model.en_metatag_title,
+                        fa_metatag_description: model.fa_metatag_description,
+                        en_metatag_description: model.en_metatag_description        
                     }
                 },
                 { new: true }

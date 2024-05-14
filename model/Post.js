@@ -104,6 +104,22 @@ const postSchema = new Schema({
     },
     Comments: {
         type: [commentSchema]
+    },
+    fa_metatag_title: {
+        type: String,
+        required: true
+    },
+    en_metatag_title: {
+        type: String,
+        required: true
+    },
+    fa_metatag_description: {
+        type: String,
+        required: true
+    },
+    en_metatag_description: {
+        type: String,
+        required: true
     }
 
 }, {

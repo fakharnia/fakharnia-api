@@ -36,8 +36,23 @@ const serviceSchema = new Schema({
     },
     coverAlt: {
         type: String
+    },
+    fa_metatag_title: {
+        type: String,
+        required: true
+    },
+    en_metatag_title: {
+        type: String,
+        required: true
+    },
+    fa_metatag_description: {
+        type: String,
+        required: true
+    },
+    en_metatag_description: {
+        type: String,
+        required: true
     }
-
 })
 
 module.exports = mongoose.model("Service", serviceSchema);

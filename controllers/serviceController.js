@@ -35,8 +35,19 @@ const serviceValidation = async (rawData) => {
         if (model.deu_fileUrl === null || model.deu_fileUrl === undefined || model.deu_fileUrl.length === 0) {
             result = false;
         }
-
         if (model.coverUrl === null || model.coverUrl === undefined || model.coverUrl.length === 0) {
+            result = false;
+        }
+        if (model.fa_metatag_title === null || model.fa_metatag_title === undefined || model.fa_metatag_title.length === 0) {
+            result = false;
+        }
+        if (model.en_metatag_title === null || model.en_metatag_title === undefined || model.en_metatag_title.length === 0) {
+            result = false;
+        }
+        if (model.fa_metatag_description === null || model.fa_metatag_description === undefined || model.fa_metatag_description.length === 0) {
+            result = false;
+        }
+        if (model.en_metatag_description === null || model.en_metatag_description === undefined || model.en_metatag_description.length === 0) {
             result = false;
         }
 
@@ -103,7 +114,11 @@ const createService = async (req, res) => {
                 en_fileUrl: model.en_fileUrl,
                 deu_fileUrl: model.deu_fileUrl,
                 coverUrl: model.coverUrl,
-                coverAlt: model.coverAlt
+                coverAlt: model.coverAlt,
+                fa_metatag_title: model.fa_metatag_title,
+                en_metatag_title: model.en_metatag_title,
+                fa_metatag_description: model.fa_metatag_description,
+                en_metatag_description: model.en_metatag_description
             });
 
             return res.status(200).json({ message: "Successful" });
@@ -177,7 +192,11 @@ const updateService = async (req, res) => {
                         en_fileUrl: model.en_fileUrl,
                         deu_fileUrl: model.deu_fileUrl,
                         coverUrl: model.coverUrl,
-                        coverAlt: model.coverAlt
+                        coverAlt: model.coverAlt,
+                        fa_metatag_title: model.fa_metatag_title,
+                        en_metatag_title: model.en_metatag_title,
+                        fa_metatag_description: model.fa_metatag_description,
+                        en_metatag_description: model.en_metatag_description        
                     }
                 },
                 { new: true }
