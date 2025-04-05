@@ -1,6 +1,10 @@
 {
     "allowedOrigins": [
         "http://localhost:3000",
-        "http://localhost:3001"
+        "http://localhost:3001",
+        "https://cms.fakharnia.com",
+        "https://cms.fakharnia.ir",
+        "https://fakharnia.ir",
+        "https://fakharnia.com"
     ]
 }
